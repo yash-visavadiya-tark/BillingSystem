@@ -21,11 +21,43 @@ namespace BillingSystem
                 return UsedUntil - UsedFrom;
             }
         }
+        public String TotalUsedTime
+        {
+            get
+            {
+                return $"{Math.Floor(activeTime.TotalHours)}:{activeTime.Minutes}:{activeTime.Seconds}";
+            }
+        }
+
+        public String TotalBilledTime
+        {
+            get
+            {
+                return $"{Math.Ceiling(activeTime.TotalHours)}:{"00"}:{"00"}";
+            }
+        }
+
+        public AWSResourceUsage() {
+            AWSResourceUsageID = "";
+            CustomerID = "";
+            EC2InstanceID = "";
+            EC2InstanceType = "";
+        }
+
+        public AWSResourceUsage(AWSResourceUsage other)
+        {
+            this.AWSResourceUsageID = other.AWSResourceUsageID;
+            this.CustomerID = other.CustomerID;
+            this.EC2InstanceID = other.EC2InstanceID;
+            this.EC2InstanceType = other.EC2InstanceType;
+            this.UsedFrom = other.UsedFrom;
+            this.UsedUntil = other.UsedUntil;
+        }
 
         override
             public String ToString()
         {
-            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime}";
+            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime} {TotalUsedTime} {TotalBilledTime}";
         }
     }
 }

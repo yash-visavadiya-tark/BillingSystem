@@ -48,8 +48,8 @@ namespace BillingSystem
 
                 var customer = new Customer();
 
-                customer.CustomerID = record.data[0].Substring(1, record.data[0].Length - 2);
-                customer.CustomerName = record.data[1].Substring(1, record.data[1].Length - 2);
+                customer.CustomerID = record.data[1].Substring(1, record.data[1].Length - 2);
+                customer.CustomerName = record.data[2].Substring(1, record.data[2].Length - 2);
 
                 allCustomers.Add(customer);
             }
