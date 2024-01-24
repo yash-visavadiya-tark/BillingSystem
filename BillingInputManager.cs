@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BillingSystem
 {
-    public class InputManager
+    public class BillingInputManager
     {
         public List<AWSResourceUsage> GetAWSResourceUsages()
         {
