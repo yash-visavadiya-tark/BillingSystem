@@ -33,29 +33,7 @@ namespace BillingSystem
             }
             return allAWSResourceUsages;
         }
-
-        public List<Customer> GetCustomers()
-        {
-            var allData = File.ReadAllLines("../../../TestCases/Case1/Input/Customer.csv");
-            var records = from line in allData
-                          select line.Split(',').ToList();
-
-            var allCustomers = new List<Customer>();
-            foreach (var record in records.Select((data, ind) => (ind, data)))
-            {
-                if (record.ind == 0)
-                    continue;
-
-                var customer = new Customer();
-
-                customer.CustomerID = record.data[1].Substring(1, record.data[1].Length - 2);
-                customer.CustomerName = record.data[2].Substring(1, record.data[2].Length - 2);
-
-                allCustomers.Add(customer);
-            }
-            return allCustomers;
-        }
-
+        
         public List<AWSResourceTypes> GetAWSResourceTypes()
         {
             var allAWSResourceTypes = new List<AWSResourceTypes>();
@@ -79,6 +57,28 @@ namespace BillingSystem
                 allAWSResourceTypes.Add(awsResourceType);
             }
             return allAWSResourceTypes;
+        }
+
+        public List<Customer> GetCustomers()
+        {
+            var allData = File.ReadAllLines("../../../TestCases/Case1/Input/Customer.csv");
+            var records = from line in allData
+                          select line.Split(',').ToList();
+
+            var allCustomers = new List<Customer>();
+            foreach (var record in records.Select((data, ind) => (ind, data)))
+            {
+                if (record.ind == 0)
+                    continue;
+
+                var customer = new Customer();
+
+                customer.CustomerID = record.data[1].Substring(1, record.data[1].Length - 2);
+                customer.CustomerName = record.data[2].Substring(1, record.data[2].Length - 2);
+
+                allCustomers.Add(customer);
+            }
+            return allCustomers;
         }
     }
 }

@@ -21,21 +21,6 @@ namespace BillingSystem
                 return UsedUntil - UsedFrom;
             }
         }
-        public String TotalUsedTime
-        {
-            get
-            {
-                return $"{Math.Floor(activeTime.TotalHours)}:{activeTime.Minutes}:{activeTime.Seconds}";
-            }
-        }
-
-        public String TotalBilledTime
-        {
-            get
-            {
-                return $"{Math.Ceiling(activeTime.TotalHours)}:{"00"}:{"00"}";
-            }
-        }
 
         public AWSResourceUsage() {
             AWSResourceUsageID = "";
@@ -57,7 +42,7 @@ namespace BillingSystem
         override
             public String ToString()
         {
-            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime} {TotalUsedTime} {TotalBilledTime}";
+            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime}";
         }
     }
 }
