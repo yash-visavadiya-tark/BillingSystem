@@ -27,15 +27,7 @@ namespace BillingSystem
             // So, Cleared awsResourceUsages.
             resourceUsages.Clear();
 
-            var groupedByTime = from item in monthlyRecords
-                                group item by new
-                                {
-                                    item.CustomerID,
-                                    item.UsedFrom.Year,
-                                    item.UsedFrom.Month,
-                                }
-                                 into g
-                                select g;
+            var groupedByTime = monthlyRecords.GroupBy(x => new { x.CustomerID, x.UsedFrom.Year, x.UsedFrom.Month}).Select(x => x);
 
             foreach (var currentGroupedByTime in groupedByTime)
             {
@@ -57,13 +49,11 @@ namespace BillingSystem
                 {
                     CreateBillFile(totalBillAmount, customerIdNameMap, currentGroupedByTime, outputManager);
                 }
-
                 //Console.WriteLine();
             }
-
         }
 
-        public static void AddNewRecordsToMakeResourceUsageMonthly(AWSResourceUsage resourceUsage, List<AWSResourceUsage> monthlyRecords)
+        public void AddNewRecordsToMakeResourceUsageMonthly(AWSResourceUsage resourceUsage, List<AWSResourceUsage> monthlyRecords)
         {
             DateTime start = resourceUsage.UsedFrom;
             DateTime end = resourceUsage.UsedUntil;
@@ -87,7 +77,7 @@ namespace BillingSystem
             resourceUsage.UsedUntil = end;
         }
 
-        public static void AddAllRecordsOfSameInstanceType(IGrouping<string, AWSResourceUsage> data, ref double totalBillAmount, Dictionary<String, double> instanceTypeChargeMap, OutputManager outputManager)
+        public void AddAllRecordsOfSameInstanceType(IGrouping<string, AWSResourceUsage> data, ref double totalBillAmount, Dictionary<String, double> instanceTypeChargeMap, OutputManager outputManager)
         {
             HashSet<String> uniqueInstanceSet = new HashSet<String>();
             TimeSpan totalTime = new TimeSpan();
@@ -114,7 +104,7 @@ namespace BillingSystem
             outputManager.BillByInstanceType.Add(instanceTypeBill);
         }
 
-        public static void CreateBillFile(double totalBillAmount, Dictionary<String, String> customerIdNameMap, IGrouping<dynamic, AWSResourceUsage> currentGroupedByTime, OutputManager outputManager)
+        public void CreateBillFile(double totalBillAmount, Dictionary<String, String> customerIdNameMap, IGrouping<dynamic, AWSResourceUsage> currentGroupedByTime, OutputManager outputManager)
         {
             outputManager.CustomerName = customerIdNameMap["CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)];
             outputManager.BillingTime = currentGroupedByTime.ElementAt(0).UsedUntil;

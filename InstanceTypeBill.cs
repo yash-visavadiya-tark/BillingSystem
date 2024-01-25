@@ -20,12 +20,12 @@ namespace BillingSystem
             return $"{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},{RatePerHour},{TotalAmount:0.####}";
         }
 
-        public static String BillingTotalUsedTime(TimeSpan time)
+        public String BillingTotalUsedTime(TimeSpan time)
         {
             return $"{Math.Floor(time.TotalHours)}:{time.Minutes}:{time.Seconds}";
         }
 
-        public static String BillingTotalBilledTime(TimeSpan time)
+        public String BillingTotalBilledTime(TimeSpan time)
         {
             return $"{Math.Ceiling(time.TotalHours)}:{"00"}:{"00"}";
         }
