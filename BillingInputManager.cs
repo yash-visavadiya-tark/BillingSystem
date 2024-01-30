@@ -9,7 +9,7 @@ namespace BillingSystem
 {
     public class BillingInputManager
     {
-        public List<AWSResourceUsage> GetAWSResourceUsages()
+        public List<AWSResourceUsage> GetAWSOnDemandResourceUsages()
         {
             var allData = File.ReadAllLines("../../../Test cases/input/AWSOnDemandResourceUsage.csv");
             var records = from line in allData
@@ -31,6 +31,7 @@ namespace BillingSystem
                 awsResourceUsage.UsedUntil = Convert.ToDateTime(record.data[5]);
                 awsResourceUsage.Region = record.data[6];
                 awsResourceUsage.OS = record.data[7];
+                awsResourceUsage.Category = "On Demand";
 
                 allAWSResourceUsages.Add(awsResourceUsage);
             }
@@ -108,31 +109,29 @@ namespace BillingSystem
             return regionFreeTierMap;
         }
 
-        public List<AWSReservedInstanceUsage> GetAWSReservedInstanceUsages()
+        public List<AWSResourceUsage> GetAWSReservedInstanceUsages()
         {
             var allData = File.ReadAllLines("../../../Test cases/input/AWSReservedInstanceUsage.csv");
             var records = from line in allData
                           select line.Split(',').ToList();
 
-            var awsReservedInstanceUsages = new List<AWSReservedInstanceUsage>();
+            var awsReservedInstanceUsages = new List<AWSResourceUsage>();
 
             foreach (var record in records.Select((data, ind) => (ind, data)))
             {
                 if (record.ind == 0)
                     continue;
 
-                var awsReservedInstanceUsage = new AWSReservedInstanceUsage();
-                awsReservedInstanceUsage.AWSReservedInstanceUsageID = Convert.ToInt32(record.data[0]);
+                var awsReservedInstanceUsage = new AWSResourceUsage();
+                awsReservedInstanceUsage.AWSResourceUsageID = record.data[0];
                 awsReservedInstanceUsage.CustomerID = record.data[1];
                 awsReservedInstanceUsage.EC2InstanceID = record.data[2];
                 awsReservedInstanceUsage.EC2InstanceType= record.data[3];
-                awsReservedInstanceUsage.StartDate = Convert.ToDateTime(record.data[4]);
-                awsReservedInstanceUsage.EndDate = Convert.ToDateTime(record.data[5]);
+                awsReservedInstanceUsage.UsedFrom = Convert.ToDateTime(record.data[4]);
+                awsReservedInstanceUsage.UsedUntil = Convert.ToDateTime(record.data[5]).AddHours(23).AddMinutes(59).AddSeconds(59);
                 awsReservedInstanceUsage.Region = record.data[6];
                 awsReservedInstanceUsage.OS = record.data[7];
-
-
-                awsReservedInstanceUsage.EndDate = awsReservedInstanceUsage.EndDate.AddHours(23).AddMinutes(59).AddSeconds(59);
+                awsReservedInstanceUsage.Category = "Reserved";
                 
                 awsReservedInstanceUsages.Add(awsReservedInstanceUsage);
             }

@@ -12,7 +12,6 @@ namespace BillingSystem.Models
         public string ResourceType { get; set; } = "";
         public int TotalResources { get; set; }
         public TimeSpan TotalUsedTime { get; set; }
-        public double RatePerHour { get; set; }
         public double TotalAmount { get; set; }
         public double Discount { get; set; }
         public double ActualAmount { get; set; }

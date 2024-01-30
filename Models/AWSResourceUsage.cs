@@ -24,6 +24,7 @@ namespace BillingSystem.Models
         public string Region { get; set; }
         public string OS { get; set; }
 
+        public string Category;
 
         public AWSResourceUsage()
         {
@@ -33,6 +34,7 @@ namespace BillingSystem.Models
             EC2InstanceType = "";
             Region = "";
             OS = "";
+            Category = "";
         }
 
         public AWSResourceUsage(AWSResourceUsage other)
@@ -45,12 +47,12 @@ namespace BillingSystem.Models
             UsedUntil = other.UsedUntil;
             Region = other.Region;
             OS = other.OS;
+            Category = other.Category;
         }
 
-        override
-            public string ToString()
+        public override string ToString()
         {
-            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime} {Region} {OS}";
+            return $"{AWSResourceUsageID} {CustomerID} {EC2InstanceID} {EC2InstanceType} {UsedFrom} {UsedUntil} {activeTime} {Region} {OS} {Category}";
         }
     }
 }

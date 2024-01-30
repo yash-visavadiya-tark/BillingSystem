@@ -13,11 +13,11 @@ namespace BillingSystem
 
             List<AWSResourceTypes> resourceTypes = inputManager.GetAWSResourceTypes();
             List<Customer> customerList = inputManager.GetCustomers();
-            List<AWSResourceUsage> resourceUsages = inputManager.GetAWSResourceUsages();
+            List<AWSResourceUsage> onDemandResourceUsages = inputManager.GetAWSOnDemandResourceUsages();
             Dictionary<string, string> regionFreeTierMap = inputManager.GetRegionFreeTierMap();
-            List<AWSReservedInstanceUsage> reservedInstanceUsages = inputManager.GetAWSReservedInstanceUsages();
+            List<AWSResourceUsage> reservedInstanceUsages = inputManager.GetAWSReservedInstanceUsages();
 
-            billingManager.GenerateCustomerBillsMonthly(resourceTypes, customerList, resourceUsages, reservedInstanceUsages, regionFreeTierMap);
+            billingManager.GenerateCustomerBillsMonthly(resourceTypes, customerList, onDemandResourceUsages, reservedInstanceUsages, regionFreeTierMap);
         }
     }
 }

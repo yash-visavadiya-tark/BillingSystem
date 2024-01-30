@@ -10,11 +10,11 @@ namespace BillingSystem.Models
     {
         public string CustomerID { get; set; }
         public string CustomerName { get; set; }
+        public DateTime StartDate { get; set; }
 
-        override
-        public string ToString()
+        public override string ToString()
         {
-            return $"{CustomerID} {CustomerName}";
+            return $"{CustomerID} {CustomerName} {StartDate}";
         }
     }
 }
