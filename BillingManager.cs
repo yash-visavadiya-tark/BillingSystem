@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BillingSystem.Models;
 
 namespace BillingSystem
 {
     public class BillingManager
     {
-        public void GenerateCustomerBillsMonthly(List<AWSResourceTypes> resourceTypes, List<Customer> customerList, List<AWSResourceUsage> resourceUsages)
+        public void GenerateCustomerBillsMonthly(List<AWSResourceTypes> resourceTypes, List<Customer> customerList, List<AWSResourceUsage> resourceUsages, List<AWSReservedInstanceUsage> reservedInstanceUsages, Dictionary<string, string> regionFreeTierMap)
         {
-            Dictionary<String, double> instanceTypeChargeMap = resourceTypes.ToDictionary(key => key.InstanceType, value => value.Charge);
+            Dictionary<String, double> instanceTypeChargeMap = resourceTypes.ToDictionary(key => key.InstanceType, value => value.OnDemandCharge);
             Dictionary<String, String> customerIdNameMap = customerList.ToDictionary(key => key.CustomerID, value => value.CustomerName);
 
             var monthlyRecords = new List<AWSResourceUsage>();
@@ -108,7 +109,7 @@ namespace BillingSystem
         {
             outputManager.CustomerName = customerIdNameMap["CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)];
             outputManager.BillingTime = currentGroupedByTime.ElementAt(0).UsedUntil;
-            outputManager.TotalBillingAmount = totalBillAmount;
+            outputManager.TotalAmount = totalBillAmount;
 
             // Generate Bill
             String path = $"../../../Output/{"CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)}_{outputManager.BillingTime.ToString("MMM").ToUpper()}-{currentGroupedByTime.Key.Year}.csv";

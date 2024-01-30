@@ -1,5 +1,6 @@
 ﻿using System.Dynamic;
 using System.Text;
+using BillingSystem.Models;
 
 namespace BillingSystem
 {
@@ -13,8 +14,10 @@ namespace BillingSystem
             List<AWSResourceTypes> resourceTypes = inputManager.GetAWSResourceTypes();
             List<Customer> customerList = inputManager.GetCustomers();
             List<AWSResourceUsage> resourceUsages = inputManager.GetAWSResourceUsages();
+            Dictionary<string, string> regionFreeTierMap = inputManager.GetRegionFreeTierMap();
+            List<AWSReservedInstanceUsage> reservedInstanceUsages = inputManager.GetAWSReservedInstanceUsages();
 
-            billingManager.GenerateCustomerBillsMonthly(resourceTypes, customerList, resourceUsages);
+            billingManager.GenerateCustomerBillsMonthly(resourceTypes, customerList, resourceUsages, reservedInstanceUsages, regionFreeTierMap);
         }
     }
 }

@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BillingSystem
+namespace BillingSystem.Models
 {
     public class Customer
     {
-        public String CustomerID { get; set; }
-        public String CustomerName { get; set; }
+        public string CustomerID { get; set; }
+        public string CustomerName { get; set; }
 
         override
-        public String ToString()
+        public string ToString()
         {
             return $"{CustomerID} {CustomerName}";
         }
