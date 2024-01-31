@@ -14,12 +14,10 @@ namespace BillingSystem.Models
         public TimeSpan TotalUsedTime { get; set; }
         public double TotalAmount { get; set; }
         public double Discount { get; set; }
-        public double ActualAmount { get; set; }
 
-        override
-        public string ToString()
+        public override string ToString()
         {
-            return $"{Region},{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},{TotalAmount:0.####},{TotalAmount:0.####},{Discount:0.####},{ActualAmount:0.####}";
+            return $"{Region},{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},{TotalAmount:0.0000},{Discount:0.0000},{TotalAmount - Discount:0.0000}";
         }
 
         public string BillingTotalUsedTime(TimeSpan time)

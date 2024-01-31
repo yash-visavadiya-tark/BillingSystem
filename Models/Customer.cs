@@ -10,11 +10,11 @@ namespace BillingSystem.Models
     {
         public string CustomerID { get; set; }
         public string CustomerName { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime JoinDate { get; set; } = new DateTime(9999, 12, 31);
 
         public override string ToString()
         {
-            return $"{CustomerID} {CustomerName} {StartDate}";
+            return $"{CustomerID} {CustomerName} {JoinDate}";
         }
     }
 }

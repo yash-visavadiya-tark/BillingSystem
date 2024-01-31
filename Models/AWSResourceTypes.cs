@@ -23,8 +23,7 @@ namespace BillingSystem.Models
             Region = "";
         }
 
-        override
-        public string ToString()
+        public override string ToString()
         {
             return $"{AWSResourceID} {InstanceType} {OnDemandCharge} {ReservedCharge} {Region}";
         }

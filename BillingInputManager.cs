@@ -128,7 +128,7 @@ namespace BillingSystem
                 awsReservedInstanceUsage.EC2InstanceID = record.data[2];
                 awsReservedInstanceUsage.EC2InstanceType= record.data[3];
                 awsReservedInstanceUsage.UsedFrom = Convert.ToDateTime(record.data[4]);
-                awsReservedInstanceUsage.UsedUntil = Convert.ToDateTime(record.data[5]).AddHours(23).AddMinutes(59).AddSeconds(59);
+                awsReservedInstanceUsage.UsedUntil = Convert.ToDateTime(record.data[5]).AddDays(1);
                 awsReservedInstanceUsage.Region = record.data[6];
                 awsReservedInstanceUsage.OS = record.data[7];
                 awsReservedInstanceUsage.Category = "Reserved";
