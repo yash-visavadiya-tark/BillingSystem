@@ -59,7 +59,7 @@ namespace BillingSystem
             DateTime end = resourceUsage.UsedUntil;
 
             double totalDiff = (end - start).TotalSeconds;
-            DateTime last = new DateTime(start.Year, start.Month, DateTime.DaysInMonth(start.Year, start.Month), 23, 59, 59);
+            DateTime last = new DateTime(start.AddMonths(1).Year, start.AddMonths(1).Month, 1);
 
             while ((last - start).TotalSeconds < totalDiff)
             {
@@ -69,8 +69,8 @@ namespace BillingSystem
                 AWSResourceUsage newRecord = new AWSResourceUsage(resourceUsage);
                 monthlyRecords.Add(newRecord);
 
-                start = last.AddSeconds(1);
-                last = new DateTime(start.Year, start.Month, DateTime.DaysInMonth(start.Year, start.Month), 23, 59, 59);
+                start = last;
+                last = start.AddMonths(1);
                 totalDiff = (end - start).TotalSeconds;
             }
             resourceUsage.UsedFrom = start;
@@ -107,7 +107,7 @@ namespace BillingSystem
         public void CreateBillFile(double totalBillAmount, Dictionary<String, String> customerIdNameMap, IGrouping<dynamic, AWSResourceUsage> currentGroupedByTime, OutputManager outputManager)
         {
             outputManager.CustomerName = customerIdNameMap["CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)];
-            outputManager.BillingTime = currentGroupedByTime.ElementAt(0).UsedUntil;
+            outputManager.BillingTime = currentGroupedByTime.ElementAt(0).UsedFrom;
             outputManager.TotalBillingAmount = totalBillAmount;
 
             // Generate Bill

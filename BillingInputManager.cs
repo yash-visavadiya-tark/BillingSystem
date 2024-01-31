@@ -10,7 +10,7 @@ namespace BillingSystem
     {
         public List<AWSResourceUsage> GetAWSResourceUsages()
         {
-            var allData = File.ReadAllLines("../../../TestCases/Case1/Input/AWSCustomerUsage.csv");
+            var allData = File.ReadAllLines("../../../TestCases/Case4/Input/AWSCustomerUsage.csv");
             var records = from line in allData
                           select line.Split(',').ToList();
 
@@ -38,7 +38,7 @@ namespace BillingSystem
         {
             var allAWSResourceTypes = new List<AWSResourceTypes>();
 
-            var allData = File.ReadAllLines("../../../TestCases/Case1/Input/AWSResourceTypes.csv");
+            var allData = File.ReadAllLines("../../../TestCases/Case4/Input/AWSResourceTypes.csv");
             var records = from line in allData
                           select line.Split(',').ToList();
 
@@ -61,7 +61,7 @@ namespace BillingSystem
 
         public List<Customer> GetCustomers()
         {
-            var allData = File.ReadAllLines("../../../TestCases/Case1/Input/Customer.csv");
+            var allData = File.ReadAllLines("../../../TestCases/Case4/Input/Customer.csv");
             var records = from line in allData
                           select line.Split(',').ToList();
 
