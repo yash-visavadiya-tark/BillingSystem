@@ -18,6 +18,7 @@ namespace BillingSystem
             List<AWSResourceUsage> reservedInstanceUsages = inputManager.GetAWSReservedInstanceUsages();
 
             billingManager.GenerateCustomerBillsMonthly(resourceTypes, customerList, onDemandResourceUsages, reservedInstanceUsages, regionFreeTierMap);
+
         }
     }
 }
