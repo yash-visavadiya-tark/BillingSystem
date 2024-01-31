@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Basic\TestCase4\" />
+    <Folder Include="Basic\TestCase3\" />
+    <Folder Include="Basic\TestCase2\" />
+    <Folder Include="Basic\TestCase1\" />
     <Folder Include="Output\" />
+    <Folder Include="TestCases\Case3\Output\" />
   </ItemGroup>
 
 </Project>

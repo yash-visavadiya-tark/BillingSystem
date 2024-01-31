@@ -18,7 +18,7 @@ namespace BillingSystem
             StringBuilder output = new StringBuilder();
             output.AppendLine(CustomerName);
             output.AppendLine($"Bill for month of {BillingTime.ToString("MMMM")} {BillingTime.ToString("yyyy")}");
-            output.AppendLine($"Total Amount: ${TotalBillingAmount:0.####}");
+            output.AppendLine($"Total Amount: {TotalBillingAmount:0.####}");
             output.AppendLine("Resource Type,Total Resources,Total Used Time (HH:mm:ss),Total Billed Time (HH:mm:ss),Rate (per hour),Total Amount");
             foreach(var bill in BillByInstanceType)
             {

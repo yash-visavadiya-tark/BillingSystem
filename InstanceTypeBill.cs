@@ -17,7 +17,7 @@ namespace BillingSystem
         override
         public String ToString()
         {
-            return $"{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},{RatePerHour},{TotalAmount:0.####}";
+            return $"{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},${RatePerHour},${TotalAmount:0.####}";
         }
 
         public String BillingTotalUsedTime(TimeSpan time)

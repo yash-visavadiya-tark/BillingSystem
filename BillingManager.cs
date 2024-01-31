@@ -111,7 +111,7 @@ namespace BillingSystem
             outputManager.TotalBillingAmount = totalBillAmount;
 
             // Generate Bill
-            String path = $"../../../Output/{"CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)}_{outputManager.BillingTime.ToString("MMM").ToUpper()}-{currentGroupedByTime.Key.Year}.csv";
+            String path = $"../../../Basic/TestCase4/{"CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)}_{outputManager.BillingTime.ToString("MMM").ToUpper()}-{currentGroupedByTime.Key.Year}.csv";
             File.WriteAllText(path, outputManager.GenerateBill());
         }
     }
