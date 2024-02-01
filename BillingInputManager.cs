@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BillingSystem.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace BillingSystem
 {
     public class BillingInputManager
     {
         private static string _PATH = "../../../Test cases/input/";
+        private CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            HeaderValidated = null,
+            MissingFieldFound = null
+        };
         public List<AWSResourceUsage> GetAWSOnDemandResourceUsages()
         {
             var FileName = "AWSOnDemandResourceUsage.csv";
@@ -31,7 +40,7 @@ namespace BillingSystem
             }
             return allAWSResourceUsages;
         }
-        
+
         public List<AWSResourceTypes> GetAWSResourceTypes()
         {
             var allAWSResourceTypes = new List<AWSResourceTypes>();
@@ -61,26 +70,15 @@ namespace BillingSystem
 
         public List<Customer> GetCustomers()
         {
-            var allCustomers = new List<Customer>();
             var FileName = "Customer.csv";
-
-            var allData = File.ReadAllLines(_PATH + FileName);
-            var records = from line in allData
-                          select line.Split(',').ToList();
-
-            foreach (var record in records.Select((data, ind) => (ind, data)))
+            using (var reader = new StreamReader(_PATH + FileName))
             {
-                if (record.ind == 0)
-                    continue;
-
-                var customer = new Customer();
-
-                customer.CustomerID = record.data[1];
-                customer.CustomerName = record.data[2];
-
-                allCustomers.Add(customer);
+                using (var csv = new CsvReader(reader, config))
+                {
+                    var records = csv.GetRecords<Customer>();
+                    return records.ToList();        
+                }
             }
-            return allCustomers;
         }
 
         public Dictionary<string, string> GetRegionFreeTierMap()
@@ -108,10 +106,24 @@ namespace BillingSystem
 
         public List<AWSResourceUsage> GetAWSReservedInstanceUsages()
         {
+
             var awsReservedInstanceUsages = new List<AWSResourceUsage>();
             var FileName = "AWSReservedInstanceUsage.csv";
             var Category = "Reserved";
 
+            using (var reader = new StreamReader(_PATH + FileName))
+            {
+                using (var csv = new CsvReader(reader, config))
+                {
+                    var data = csv.GetRecords<AWSResourceUsage>();
+
+                    foreach (var record in data)
+                    {
+                        record.UsedUntil.AddDays(1);
+                        record.Category = Category;
+                    }
+                }
+            }
             var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
@@ -122,7 +134,7 @@ namespace BillingSystem
                     continue;
 
                 var awsReservedInstanceUsage = new AWSResourceUsage(awsResourceUsageID: record.data[0], customerID: record.data[1], ec2InstanceID: record.data[2], ec2InstanceType: record.data[3], usedFrom: Convert.ToDateTime(record.data[4]), usedUntil: Convert.ToDateTime(record.data[5]).AddDays(1), region: record.data[6], os: record.data[7], category: Category);
-                
+
                 awsReservedInstanceUsages.Add(awsReservedInstanceUsage);
             }
             return awsReservedInstanceUsages;

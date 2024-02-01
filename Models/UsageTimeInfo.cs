@@ -17,13 +17,6 @@ namespace BillingSystem.Models
         {
             
         }
-        public UsageTimeInfo(TimeSpan OnDemand, TimeSpan Reserved, TimeSpan Linux, TimeSpan Windows)
-        {
-            this.OnDemand = OnDemand;
-            this.Reserved = Reserved;
-            this.Linux = Linux;
-            this.Windows = Windows;
-        }
 
         public override string ToString()
         {

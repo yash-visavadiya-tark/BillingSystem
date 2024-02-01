@@ -3,17 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper.Configuration.Attributes;
 
 namespace BillingSystem.Models
 {
     public class AWSResourceUsage
     {
+        [Index(0)]
         public string AWSResourceUsageID { get; set; }
+
+        [Index(1)] //EC2 Instance ID,EC2 Instance Type,Start Date,End Date,Region,OS
         public string CustomerID { get; set; }
+
+        [Index(2)]
         public string EC2InstanceID { get; set; }
+
+        [Index(3)]
         public string EC2InstanceType { get; set; }
+
+        [Index(4)]
         public DateTime UsedFrom { get; set; }
+
+        [Index(5)]
         public DateTime UsedUntil { get; set; }
+
         public TimeSpan activeTime
         {
             get
@@ -21,7 +34,11 @@ namespace BillingSystem.Models
                 return UsedUntil - UsedFrom;
             }
         }
+
+        [Index(6)]
         public string Region { get; set; }
+
+        [Index(7)]
         public string OS { get; set; }
 
         public string Category;
