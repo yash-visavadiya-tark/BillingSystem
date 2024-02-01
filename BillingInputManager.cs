@@ -9,29 +9,23 @@ namespace BillingSystem
 {
     public class BillingInputManager
     {
+        private static string _PATH = "../../../Test cases/input/";
         public List<AWSResourceUsage> GetAWSOnDemandResourceUsages()
         {
-            var allData = File.ReadAllLines("../../../Test cases/input/AWSOnDemandResourceUsage.csv");
+            var FileName = "AWSOnDemandResourceUsage.csv";
+            var Category = "On Demand";
+            var allAWSResourceUsages = new List<AWSResourceUsage>();
+
+            var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
 
-            var allAWSResourceUsages = new List<AWSResourceUsage>();
             foreach (var record in records.Select((data, ind) => (ind, data)))
             {
                 if (record.ind == 0)
                     continue;
 
-                var awsResourceUsage = new AWSResourceUsage();
-
-                awsResourceUsage.AWSResourceUsageID = record.data[0];
-                awsResourceUsage.CustomerID = record.data[1];
-                awsResourceUsage.EC2InstanceID = record.data[2];
-                awsResourceUsage.EC2InstanceType = record.data[3];
-                awsResourceUsage.UsedFrom = Convert.ToDateTime(record.data[4]);
-                awsResourceUsage.UsedUntil = Convert.ToDateTime(record.data[5]);
-                awsResourceUsage.Region = record.data[6];
-                awsResourceUsage.OS = record.data[7];
-                awsResourceUsage.Category = "On Demand";
+                var awsResourceUsage = new AWSResourceUsage(awsResourceUsageID: record.data[0], customerID: record.data[1], ec2InstanceID: record.data[2], ec2InstanceType: record.data[3], usedFrom: Convert.ToDateTime(record.data[4]), usedUntil: Convert.ToDateTime(record.data[5]), region: record.data[6], os: record.data[7], category: Category);
 
                 allAWSResourceUsages.Add(awsResourceUsage);
             }
@@ -41,11 +35,11 @@ namespace BillingSystem
         public List<AWSResourceTypes> GetAWSResourceTypes()
         {
             var allAWSResourceTypes = new List<AWSResourceTypes>();
+            var FileName = "AWSResourceTypes.csv";
 
-            var allData = File.ReadAllLines("../../../Test cases/input/AWSResourceTypes.csv");
+            var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
-
 
             foreach (var record in records.Select((data, ind) => new { ind, data }))
             {
@@ -67,11 +61,13 @@ namespace BillingSystem
 
         public List<Customer> GetCustomers()
         {
-            var allData = File.ReadAllLines("../../../Test cases/input/Customer.csv");
+            var allCustomers = new List<Customer>();
+            var FileName = "Customer.csv";
+
+            var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
 
-            var allCustomers = new List<Customer>();
             foreach (var record in records.Select((data, ind) => (ind, data)))
             {
                 if (record.ind == 0)
@@ -89,11 +85,12 @@ namespace BillingSystem
 
         public Dictionary<string, string> GetRegionFreeTierMap()
         {
-            var allData = File.ReadAllLines("../../../Test cases/input/Region.csv");
+            var regionFreeTierMap = new Dictionary<string, string>();
+            var FileName = "Region.csv";
+
+            var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
-
-            var regionFreeTierMap = new Dictionary<string, string>();
 
             foreach (var record in records.Select((data, ind) => (ind, data)))
             {
@@ -111,27 +108,20 @@ namespace BillingSystem
 
         public List<AWSResourceUsage> GetAWSReservedInstanceUsages()
         {
-            var allData = File.ReadAllLines("../../../Test cases/input/AWSReservedInstanceUsage.csv");
+            var awsReservedInstanceUsages = new List<AWSResourceUsage>();
+            var FileName = "AWSReservedInstanceUsage.csv";
+            var Category = "Reserved";
+
+            var allData = File.ReadAllLines(_PATH + FileName);
             var records = from line in allData
                           select line.Split(',').ToList();
-
-            var awsReservedInstanceUsages = new List<AWSResourceUsage>();
 
             foreach (var record in records.Select((data, ind) => (ind, data)))
             {
                 if (record.ind == 0)
                     continue;
 
-                var awsReservedInstanceUsage = new AWSResourceUsage();
-                awsReservedInstanceUsage.AWSResourceUsageID = record.data[0];
-                awsReservedInstanceUsage.CustomerID = record.data[1];
-                awsReservedInstanceUsage.EC2InstanceID = record.data[2];
-                awsReservedInstanceUsage.EC2InstanceType= record.data[3];
-                awsReservedInstanceUsage.UsedFrom = Convert.ToDateTime(record.data[4]);
-                awsReservedInstanceUsage.UsedUntil = Convert.ToDateTime(record.data[5]).AddDays(1);
-                awsReservedInstanceUsage.Region = record.data[6];
-                awsReservedInstanceUsage.OS = record.data[7];
-                awsReservedInstanceUsage.Category = "Reserved";
+                var awsReservedInstanceUsage = new AWSResourceUsage(awsResourceUsageID: record.data[0], customerID: record.data[1], ec2InstanceID: record.data[2], ec2InstanceType: record.data[3], usedFrom: Convert.ToDateTime(record.data[4]), usedUntil: Convert.ToDateTime(record.data[5]).AddDays(1), region: record.data[6], os: record.data[7], category: Category);
                 
                 awsReservedInstanceUsages.Add(awsReservedInstanceUsage);
             }

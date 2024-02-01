@@ -16,5 +16,9 @@ namespace BillingSystem.Models
             this.OnDemandCharge = OnDemandCharge;
             this.ReservedCharge = ReservedCharge;
         }
+        public override string ToString()
+        {
+            return OnDemandCharge + " " + ReservedCharge;
+        }
     }
 }

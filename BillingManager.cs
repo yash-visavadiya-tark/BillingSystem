@@ -11,6 +11,12 @@ namespace BillingSystem
 {
     public class BillingManager
     {
+
+        private Customer GetCustomer(string customerID, List<Customer> customerList)
+        {
+            return customerList.Where(x => x.CustomerID.Equals(customerID.Substring(0, 4) + "-" + customerID.Substring(4))).ToList().First();
+        }
+
         private void AddNewRecordsToMakeResourceUsageMonthly(AWSResourceUsage resourceUsage, List<AWSResourceUsage> monthlyRecords)
         {
             DateTime start = resourceUsage.UsedFrom;
@@ -42,7 +48,7 @@ namespace BillingSystem
             var monthlyResourceUsages = new List<AWSResourceUsage>();
             foreach (var item in resourceUsages)
             {
-                var customer = customerList.Where(x => x.CustomerID.Equals(item.CustomerID.Substring(0, 4) + "-" + item.CustomerID.Substring(4))).ToList().FirstOrDefault();
+                var customer = customerList.Where(x => x.CustomerID.Equals(item.CustomerID.Substring(0, 4) + "-" + item.CustomerID.Substring(4))).ToList().First();
                 customer.JoinDate = customer.JoinDate.CompareTo(item.UsedFrom) <= 0 ? customer.JoinDate : item.UsedFrom;
 
                 AddNewRecordsToMakeResourceUsageMonthly(item, monthlyResourceUsages);
@@ -59,91 +65,111 @@ namespace BillingSystem
             return monthlyResourceUsages;
         }
 
-        public void AddAllRecordsOfSameInstanceType(ref (int Linux, int Windows) discountBalanceHours,IGrouping<dynamic, AWSResourceUsage> data, ref (double BillAmount, double Discount) total, Dictionary<InstancePriceKey, InstancePriceValue> instanceTypeChargeMap, OutputManager outputManager, List<Customer> customers, Dictionary<string, string> regionFreeTierMap)
+        private UsageTimeInfo GetUsageTime(IGrouping<dynamic, AWSResourceUsage> data)
         {
             UsageTimeInfo TotalTime = new UsageTimeInfo();
-            
-            void AddTime(IGrouping<dynamic, AWSResourceUsage> data, UsageTimeInfo TotalTime)
+            foreach (var item in data)
             {
-                foreach (var item in data)
-                {
-                    Console.WriteLine(item);
+                Console.WriteLine(item);
 
-                    if (item.Category.Equals("On Demand"))
-                    {
-                        TotalTime.OnDemand += item.activeTime;
-                        if (item.OS.Equals("Windows"))
-                            TotalTime.Windows += item.activeTime;
-                        else
-                            TotalTime.Linux += item.activeTime;
-                    }
+                if (item.Category.Equals("On Demand"))
+                {
+                    TotalTime.OnDemand += item.activeTime;
+                    if (item.OS.Equals("Windows"))
+                        TotalTime.Windows += item.activeTime;
                     else
-                    {
-                        TotalTime.Reserved += item.activeTime;
-                    }
+                        TotalTime.Linux += item.activeTime;
                 }
-                Console.WriteLine();
-            }
-            
-            void CalculateDiscount()
-            {
-
-            }
-
-            AddTime(data, TotalTime);
-
-            String InstanceType = data.FirstOrDefault().EC2InstanceType;
-            String Region = data.Key.Region;
-
-            double instanceTypeTotalAmount = 0;
-            InstancePriceKey instanceTypeRegion = new InstancePriceKey(InstanceType, Region);
-            instanceTypeTotalAmount += Math.Ceiling(TotalTime.OnDemand.TotalHours) * instanceTypeChargeMap[instanceTypeRegion].OnDemandCharge;
-            instanceTypeTotalAmount += Math.Ceiling(TotalTime.Reserved.TotalHours) * instanceTypeChargeMap[instanceTypeRegion].ReservedCharge;
-
-            total.BillAmount += instanceTypeTotalAmount;
-
-            // Add A Record
-            InstanceTypeBill instanceTypeBill = new InstanceTypeBill();
-            instanceTypeBill.Region = Region;
-            instanceTypeBill.ResourceType = InstanceType;
-            instanceTypeBill.TotalResources = data.DistinctBy(x => x.EC2InstanceID).Count();
-            instanceTypeBill.TotalUsedTime = TotalTime.OnDemand + TotalTime.Reserved;
-            instanceTypeBill.TotalAmount = instanceTypeTotalAmount;
-
-            string customerID = data.ElementAt(0).CustomerID;
-            var currDate = data.ElementAt(0).UsedUntil;
-            var JoinDate = customers.Where(x => x.CustomerID.Equals(customerID.Substring(0, 4) + "-" + customerID.Substring(4))).ToList().ElementAt(0).JoinDate;
-            JoinDate = new DateTime(JoinDate.Year, JoinDate.Month, 1);
-
-            // Apply Discount
-            // Checking if Current Date is Within 1 Year Range of Join Date
-            double discount = 0;
-            if (JoinDate.CompareTo(currDate) <= 0 && currDate.CompareTo(JoinDate.AddYears(1)) < 0) 
-            {
-                if (regionFreeTierMap[data.Key.Region].Equals(InstanceType))
+                else
                 {
-                    discount += Math.Min(discountBalanceHours.Windows, Math.Ceiling(TotalTime.Windows.TotalHours)) * instanceTypeChargeMap[instanceTypeRegion].OnDemandCharge;
-                    discountBalanceHours.Windows = Math.Max(0, discountBalanceHours.Windows - (int)Math.Ceiling(TotalTime.Windows.TotalHours));
-                    discount += Math.Min(discountBalanceHours.Linux, Math.Ceiling(TotalTime.Linux.TotalHours)) * instanceTypeChargeMap[instanceTypeRegion].OnDemandCharge;
-                    discountBalanceHours.Linux = Math.Max(0, discountBalanceHours.Linux - (int)Math.Ceiling(TotalTime.Linux.TotalHours));
+                    TotalTime.Reserved += item.activeTime;
                 }
             }
-            total.Discount += discount;
-            instanceTypeBill.Discount = discount;
+            Console.WriteLine();
+            return TotalTime;
+        }
+
+        private double GetTotalAmount(InstancePriceValue instancePrice, UsageTimeInfo TotalTime)
+        {
+            double totalAmount = 0;
+            totalAmount += Math.Ceiling(TotalTime.OnDemand.TotalHours) * instancePrice.OnDemandCharge;
+            totalAmount += Math.Ceiling(TotalTime.Reserved.TotalHours) * instancePrice.ReservedCharge;
+            return totalAmount;
+        }
+
+        // This function gives customer Joined Month first day
+        private DateTime GetJoinDateOfCustomer(List<Customer> customerList, string customerID)
+        {
+            var JoinDate = customerList.Where(x => x.CustomerID.Equals(customerID.Substring(0, 4) + "-" + customerID.Substring(4))).ToList().First().JoinDate;
+            return new DateTime(JoinDate.Year, JoinDate.Month, 1);
+        }
+
+        private double GetTotalDiscount(UsageTimeInfo TotalTime, DiscountBalance discountBalance, AWSResourceUsage resourceUsage, InstancePriceValue instancePrice, Customer customer, string freeInstanceType)
+        {
+            double totalDiscount = 0;
+
+            string customerID = resourceUsage.CustomerID;
+            var currDate = resourceUsage.UsedUntil;
+            var JoinDate = new DateTime(customer.JoinDate.Year, customer.JoinDate.Month, 1); // for discount, count from start of the month
+
+            // Checking if Current Date is Within 1 Year Range of Join Date
+            if (JoinDate.CompareTo(currDate) <= 0 && currDate.CompareTo(JoinDate.AddYears(1)) <= 0)
+            {
+                if (freeInstanceType.Equals(resourceUsage.EC2InstanceType))
+                {
+                    totalDiscount += Math.Min(discountBalance.Windows, Math.Ceiling(TotalTime.Windows.TotalHours)) * instancePrice.OnDemandCharge;
+                    discountBalance.Windows = Math.Max(0, discountBalance.Windows - (int)Math.Ceiling(TotalTime.Windows.TotalHours));
+
+                    totalDiscount += Math.Min(discountBalance.Linux, Math.Ceiling(TotalTime.Linux.TotalHours)) * instancePrice.OnDemandCharge;
+                    discountBalance.Linux = Math.Max(0, discountBalance.Linux - (int)Math.Ceiling(TotalTime.Linux.TotalHours));
+                }
+            }
+            return totalDiscount;
+        }
+
+        private ChargeDetails GetCharge(AWSResourceUsage resourceUsage, Customer customer, string freeInstanceType, InstancePriceValue instancePrice, UsageTimeInfo totalTime, DiscountBalance discountBalance)
+        {
+            ChargeDetails charge = new ChargeDetails();
+            InstancePriceKey instanceTypeRegion = new InstancePriceKey(instanceType: resourceUsage.EC2InstanceType, region: resourceUsage.Region);
+
+            charge.TotalAmount = GetTotalAmount(instancePrice: instancePrice, totalTime);
+
+            charge.TotalDiscount = GetTotalDiscount(totalTime, discountBalance, resourceUsage: resourceUsage, instancePrice: instancePrice, customer: customer, freeInstanceType: freeInstanceType);
+
+            return charge;
+        }
+
+        public void AddAllRecordsOfSameInstanceType(DiscountBalance discountBalance, IGrouping<dynamic, AWSResourceUsage> data, ChargeDetails total, Dictionary<InstancePriceKey, InstancePriceValue> instanceTypeChargeMap, OutputManager outputManager, List<Customer> customers, Dictionary<string, string> regionFreeTierMap)
+        {
+            UsageTimeInfo TotalTime = GetUsageTime(data);
+
+            AWSResourceUsage resourceUsage = data.First();
+            Customer customer = GetCustomer(resourceUsage.CustomerID, customerList: customers);
+            InstancePriceValue instancePrice = DictionaryExtensionsClass.GetValueOrDefault(instanceTypeChargeMap, new InstancePriceKey(instanceType: resourceUsage.EC2InstanceType, region: resourceUsage.Region));
+            string freeInstanceType = regionFreeTierMap[resourceUsage.Region];
+
+            ChargeDetails charge = GetCharge(resourceUsage: resourceUsage, customer: customer, freeInstanceType: freeInstanceType, instancePrice: instancePrice, totalTime: TotalTime, discountBalance: discountBalance);
+
+            total.TotalAmount += charge.TotalAmount;
+            total.TotalDiscount += charge.TotalDiscount;
+
+            Console.WriteLine(total + " " + TotalTime);
+
+            InstanceTypeBill instanceTypeBill = new InstanceTypeBill(region: resourceUsage.Region, resourceType: resourceUsage.EC2InstanceType, totalResources: data.DistinctBy(x => x.EC2InstanceID).Count(), totalUsedTime: TotalTime.OnDemand + TotalTime.Reserved, charge: charge);
 
             outputManager.BillByInstanceType.Add(instanceTypeBill);
         }
 
-        public void CreateBillFile((double BillAmount, double Discount) total, Dictionary<String, String> customerIdNameMap, IGrouping<dynamic, AWSResourceUsage> currentGroupedByTime, OutputManager outputManager)
+        public void CreateBillFile(ChargeDetails total, Dictionary<String, String> customerIdNameMap, IGrouping<dynamic, AWSResourceUsage> currentGroupedByTime, OutputManager outputManager)
         {
             outputManager.CustomerName = customerIdNameMap["CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)];
-            outputManager.BillingTime = currentGroupedByTime.ElementAt(0).UsedFrom;
-            outputManager.TotalAmount = total.BillAmount;
-            outputManager.TotalDiscount = total.Discount;
-            outputManager.ActualAmount = total.BillAmount - total.Discount;
+            outputManager.BillingTime = currentGroupedByTime.First().UsedFrom;
+            outputManager.TotalAmount = total.TotalAmount;
+            outputManager.TotalDiscount = total.TotalDiscount;
+            outputManager.ActualAmount = total.TotalAmount - total.TotalDiscount;
 
             // Generate Bill
-            String path = $"../../../Output/{"CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)}_{outputManager.BillingTime.ToString("MMM").ToUpper()}-{currentGroupedByTime.Key.Year}.csv";
+            String path = $"../../../Enhancement-1/Output/{"CUST-" + currentGroupedByTime.Key.CustomerID.Substring(4)}_{outputManager.BillingTime.ToString("MMM").ToUpper()}-{currentGroupedByTime.Key.Year}.csv";
             File.WriteAllText(path, outputManager.GenerateBill());
         }
 
@@ -160,17 +186,17 @@ namespace BillingSystem
 
                 var groupedByType = currentGroupedByTime.GroupBy(x => new { x.EC2InstanceType, x.Region });
 
-                (double BillAmount, double Discount) total = (0, 0);
-                (int Linux, int Windows) discountBalanceHours = (750, 750);
+                ChargeDetails total = new ChargeDetails();
+                DiscountBalance discountBalance = new DiscountBalance(750, 750);
                 OutputManager outputManager = new OutputManager();
 
                 foreach (var data in groupedByType)
                 {
                     Console.WriteLine(data.Key);
-                    AddAllRecordsOfSameInstanceType(ref discountBalanceHours, data, ref total, instanceTypeChargeMap, outputManager, customerList, regionFreeTierMap);
+                    AddAllRecordsOfSameInstanceType(discountBalance, data, total, instanceTypeChargeMap, outputManager, customerList, regionFreeTierMap);
                 }
 
-                if (total.BillAmount > 0)
+                if (total.TotalAmount > 0)
                 {
                     CreateBillFile(total, customerIdNameMap, currentGroupedByTime, outputManager);
                 }

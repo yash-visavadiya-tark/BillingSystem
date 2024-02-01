@@ -28,13 +28,19 @@ namespace BillingSystem.Models
 
         public AWSResourceUsage()
         {
-            AWSResourceUsageID = "";
-            CustomerID = "";
-            EC2InstanceID = "";
-            EC2InstanceType = "";
-            Region = "";
-            OS = "";
-            Category = "";
+        }
+
+        public AWSResourceUsage(string awsResourceUsageID, string customerID, string ec2InstanceID, string ec2InstanceType, DateTime usedFrom, DateTime usedUntil, string region, string os, string category)
+        {
+            AWSResourceUsageID = awsResourceUsageID;
+            CustomerID = customerID;
+            EC2InstanceID = ec2InstanceID;
+            EC2InstanceType = ec2InstanceType;
+            UsedFrom = usedFrom;
+            UsedUntil = usedUntil;
+            Region = region;
+            OS = os;
+            Category = category;
         }
 
         public AWSResourceUsage(AWSResourceUsage other)

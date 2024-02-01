@@ -21,9 +21,9 @@ namespace BillingSystem.Models
             output.AppendLine(CustomerName);
             output.AppendLine($"Bill for month of {BillingTime.ToString("MMMM")} {BillingTime.ToString("yyyy")}");
             output.AppendLine($"Total Amount: ${TotalAmount:0.0000}");
-            output.AppendLine($"Total Discount: ${TotalDiscount:0.0000}");
+            output.AppendLine($"Discount: ${TotalDiscount:0.0000}");
             output.AppendLine($"Actual Amount: ${ActualAmount:0.0000}");
-            output.AppendLine("Region,Resource Type,Total Resources,Total Used Time (HH:mm:ss),Total Billed Time (HH:mm:ss),Total Amount,Discount,Actual Amount");
+            output.AppendLine("Resource Type, Total Resouorces, Total Used Time (HH:mm:ss), Total Billed Time (HH:mm:ss), Total Amount, Discount, Actual Amount");
             foreach (var bill in BillByInstanceType)
             {
                 output.AppendLine(bill.ToString());

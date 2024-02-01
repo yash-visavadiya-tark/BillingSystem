@@ -24,5 +24,10 @@ namespace BillingSystem.Models
             this.Linux = Linux;
             this.Windows = Windows;
         }
+
+        public override string ToString()
+        {
+            return $"{OnDemand} {Reserved} {Linux} {Windows}";
+        }
     }
 }

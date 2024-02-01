@@ -8,26 +8,34 @@ namespace BillingSystem.Models
 {
     public class InstanceTypeBill
     {
-        public string Region { get; set; } = "";
-        public string ResourceType { get; set; } = "";
-        public int TotalResources { get; set; }
-        public TimeSpan TotalUsedTime { get; set; }
-        public double TotalAmount { get; set; }
-        public double Discount { get; set; }
+        private string Region { get; }
+        private string ResourceType { get; }
+        private int TotalResources { get; }
+        private TimeSpan TotalUsedTime { get; }
+        public ChargeDetails Charge { get; }
+
+        public InstanceTypeBill(string region, string resourceType, int totalResources, TimeSpan totalUsedTime, ChargeDetails charge)
+        {
+            Region = region;
+            ResourceType = resourceType;
+            TotalResources = totalResources;
+            TotalUsedTime = totalUsedTime;
+            Charge = charge;
+        }
 
         public override string ToString()
         {
-            return $"{Region},{ResourceType},{TotalResources},{BillingTotalUsedTime(TotalUsedTime)},{BillingTotalBilledTime(TotalUsedTime)},{TotalAmount:0.0000},{Discount:0.0000},{TotalAmount - Discount:0.0000}";
+            return $"{Region}, {ResourceType}, {TotalResources}, {BillingTotalUsedTime(TotalUsedTime)}, {BillingTotalBilledTime(TotalUsedTime)}, ${Charge.TotalAmount:0.0000}, ${Charge.TotalDiscount:0.0000}, ${Charge.TotalAmount - Charge.TotalDiscount:0.0000}";
         }
 
-        public string BillingTotalUsedTime(TimeSpan time)
+        private string BillingTotalUsedTime(TimeSpan time)
         {
             return $"{Math.Floor(time.TotalHours)}:{time.Minutes}:{time.Seconds}";
         }
 
-        public string BillingTotalBilledTime(TimeSpan time)
+        private string BillingTotalBilledTime(TimeSpan time)
         {
-            return $"{Math.Ceiling(time.TotalHours)}:{"00"}:{"00"}";
+            return $"{Math.Ceiling(time.TotalHours)}:{"0"}:{"0"}";
         }
     }
 }

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Output\" />
+    <Folder Include="Enhancement-1\Output\" />
   </ItemGroup>
 
 </Project>

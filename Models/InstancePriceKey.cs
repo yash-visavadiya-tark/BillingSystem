@@ -11,10 +11,14 @@ namespace BillingSystem.Models
         public string InstanceType { get; set; }
         public string Region { get; set; }
 
-        public InstancePriceKey(string InstanceType, string Region)
+        public InstancePriceKey(string instanceType, string region)
         {
-            this.InstanceType = InstanceType;
-            this.Region = Region;
+            InstanceType = instanceType;
+            Region = region;
+        }
+        public override string ToString()
+        {
+            return InstanceType + " " + Region;
         }
     }
 }
